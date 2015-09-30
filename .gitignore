@@ -10,3 +10,6 @@
 
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
+webapp/workshop-amazon-beanstalk-cocktail-master/.idea
+webapp/workshop-amazon-beanstalk-cocktail-master/target
+webapp/workshop-amazon-beanstalk-cocktail-master/src/main/resources/cocktail-app.properties

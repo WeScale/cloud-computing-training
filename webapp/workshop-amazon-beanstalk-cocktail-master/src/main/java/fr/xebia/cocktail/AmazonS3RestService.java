@@ -47,6 +47,9 @@ public class AmazonS3RestService {
     @Value("${aws_s3_bucket_name}")
     private String amazonS3BucketName;
 
+    @Value("${aws_s3_prefix_key}")
+    private String amazonS3BucketPrefixKey;
+
 
     private final AWSAuthConnection conn;
     private final QueryStringAuthGenerator generator;
@@ -86,12 +89,12 @@ public class AmazonS3RestService {
         String fileName = Math.abs(random.nextLong()) + "." + extension;
         S3Object object =  new S3Object(buffer, objectMetadata);
         try {
-            Response r =conn.put(amazonS3BucketName, fileName, object, objectMetadata);
+            Response r =conn.put(amazonS3BucketName, amazonS3BucketPrefixKey +"/"+fileName, object, objectMetadata);
             LOG.info(r.connection.getResponseMessage());
         } catch (IOException e) {
             LOG.error("Problem on put file to S3", e);
         }
 
-        return amazonS3BucketBaseUrl + fileName;
+        return amazonS3BucketBaseUrl + "/" + fileName;
     }
 }
