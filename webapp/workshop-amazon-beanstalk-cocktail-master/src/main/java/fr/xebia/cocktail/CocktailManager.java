@@ -15,19 +15,17 @@
  */
 package fr.xebia.cocktail;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.google.common.base.Function;
 import com.google.common.base.Predicate;
 import com.google.common.base.Throwables;
 import com.google.common.collect.Collections2;
@@ -62,6 +60,9 @@ public class CocktailManager {
     @Inject
     private CocktailRepository cocktailRepository;
 
+    @Inject
+    private IngredientsRepository ingredientsRepository;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Inject
@@ -72,13 +73,13 @@ public class CocktailManager {
     @RequestMapping(value = "/cocktail/{id}/comment", method = RequestMethod.POST)
     public String addComment(@PathVariable String id, @RequestParam("comment") String comment, HttpServletRequest request) {
 
-        Cocktail cocktail = cocktailRepository.get(id);
+        Cocktail cocktail = cocktailRepository.findOne(id);
         if (cocktail == null) {
             throw new ResourceNotFoundException(id);
         }
         logger.debug("Add comment: '{}' to {}", comment, cocktail);
-        cocktail.getComments().addFirst(comment);
-        cocktailRepository.update(cocktail);
+        cocktail.getComments().add(comment);
+        cocktailRepository.save(cocktail);
         addedCommentCount.incrementAndGet();
 
         return "redirect:/cocktail/{id}";
@@ -90,7 +91,7 @@ public class CocktailManager {
             return "cocktail/create-form";
         }
 
-        cocktailRepository.insert(cocktail);
+        cocktailRepository.save(cocktail);
 
         return "redirect:/cocktail/" + cocktail.getId();
     }
@@ -103,7 +104,7 @@ public class CocktailManager {
 
     @RequestMapping(value = "/cocktail/{id}/edit-form", method = RequestMethod.GET)
     public String displayEditForm(@PathVariable String id, Model model) {
-        Cocktail cocktail = cocktailRepository.get(id);
+        Cocktail cocktail = cocktailRepository.findOne(id);
         if (cocktail == null) {
             throw new ResourceNotFoundException(id);
         }
@@ -113,16 +114,25 @@ public class CocktailManager {
 
     @RequestMapping(method = RequestMethod.GET, value = "/cocktail/suggest/ingredient")
     @ResponseBody
-    public List<String> suggestCocktailIngredientWord(@RequestParam("term") String term) {
-        List<String> words = this.cocktailRepository.suggestCocktailIngredientWords(term);
+    public Collection<String> suggestCocktailIngredientWord(@RequestParam("term") String term) {
+        Collection<String> words =
+        Collections2.transform(this.ingredientsRepository.findByNameStartingWith(term), new Function<Ingredient, String>() {
+            @Nullable @Override public String apply(Ingredient ingredient) {
+                return ingredient.getName();
+            }
+        });
         logger.trace("autocomplete word for {}:{}", term, words);
         return words;
     }
 
     @RequestMapping(method = RequestMethod.GET, value = "/cocktail/suggest/name")
     @ResponseBody
-    public List<String> suggestCocktailNameWord(@RequestParam("term") String term) {
-        List<String> words = this.cocktailRepository.suggestCocktailNameWords(term);
+    public Collection<String> suggestCocktailNameWord(@RequestParam("term") String term) {
+        Collection<String> words = Collections2.transform(this.cocktailRepository.findByNameStartingWith(term), new Function<Cocktail, String>() {
+            @Nullable @Override public String apply(@Nullable Cocktail cocktail) {
+                return cocktail.getName();
+            }
+        });
         logger.trace("autocomplete word for {}:{}", term, words);
         return words;
     }
@@ -144,7 +154,7 @@ public class CocktailManager {
         });
 
         cocktail.setIngredients(Lists.newArrayList(ingredients));
-        cocktailRepository.update(cocktail);
+        cocktailRepository.save(cocktail);
 
         return "redirect:/cocktail/{id}";
     }
@@ -183,10 +193,10 @@ public class CocktailManager {
                     String photoUrl = fileStorageService.storeFile(photo.getBytes(), metadata);
 
                     
-                    Cocktail cocktail = cocktailRepository.get(id);
+                    Cocktail cocktail = cocktailRepository.findOne(id);
                     logger.info("Saved {}", photoUrl);
                     cocktail.setPhotoUrl(photoUrl);
-                    cocktailRepository.update(cocktail);
+                    cocktailRepository.save(cocktail);
                 }
 
             } catch (IOException e) {
@@ -198,7 +208,7 @@ public class CocktailManager {
 
     @RequestMapping(method = RequestMethod.GET, value = "/cocktail/{id}")
     public String view(@PathVariable String id, Model model) {
-        Cocktail cocktail = cocktailRepository.get(id);
+        Cocktail cocktail = cocktailRepository.findOne(id);
         if (cocktail == null) {
             throw new ResourceNotFoundException(id);
         }
@@ -209,8 +219,14 @@ public class CocktailManager {
     @RequestMapping(method = RequestMethod.GET, value = "/cocktail")
     public ModelAndView find(@RequestParam(value = "name", required = false) String name,
                              @RequestParam(value = "ingredient", required = false) String ingredient) {
-
-        Collection<Cocktail> cocktails = cocktailRepository.find(ingredient, name);
+        Collection<Cocktail> cocktails;
+        if (name != null) {
+            cocktails = cocktailRepository.findByName(name);
+        }else if (ingredient != null){
+            cocktails = cocktailRepository.findByIngredientsName(ingredient);
+        } else {
+            cocktails = Lists.newArrayList(cocktailRepository.findAll());
+        }
         return new ModelAndView("cocktail/view-all", "cocktails", cocktails);
     }
 

@@ -18,22 +18,18 @@ package fr.xebia.cocktail;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.rest.core.annotation.RepositoryRestResource;
-import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 
 /**
  * Repository for cocktails .
  */
-@Repository()
-public interface CocktailRepository extends PagingAndSortingRepository<Cocktail, String> {
+@RepositoryRestResource()
+public interface CocktailRestRepository extends PagingAndSortingRepository<Cocktail, String> {
 
 
     Collection<Cocktail> findByName(@Param("name") String name);
 
-    Collection<Cocktail> findByNameStartingWith(@Param("name") String name);
-
     Collection<Cocktail> findByIngredientsName(@Param("ingredient") String name);
-
 
 }

@@ -26,45 +26,96 @@
     <url>https://github.com/xebia-france/workshop-amazon-beanstalk-cocktail</url>
     <scm>
         <connection>scm:git:git://github.com/xebia-france/workshop-amazon-beanstalk-cocktail.git</connection>
-        <developerConnection>scm:git:git@github.com:xebia-france/workshop-amazon-beanstalk-cocktail.git</developerConnection>
+        <developerConnection>scm:git:git@github.com:xebia-france/workshop-amazon-beanstalk-cocktail.git
+        </developerConnection>
     </scm>
     <properties>
-        <org.springframework-version>3.1.1.RELEASE</org.springframework-version>
+        <org.springframework-version>4.1.7.RELEASE</org.springframework-version>
         <org.aspectj-version>1.6.12</org.aspectj-version>
         <org.slf4j-version>1.6.4</org.slf4j-version>
 
         <m2eclipse.wtp.contextRoot>/</m2eclipse.wtp.contextRoot>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-cloud.version>1.0.3.RELEASE</spring-cloud.version>
     </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-aws</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
     <dependencies>
         <!-- Spring -->
+                <dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-framework-bom</artifactId>
+				<version>4.2.1.RELEASE</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+
+			<dependency>
+				<groupId>org.springframework.data</groupId>
+				<artifactId>spring-data-releasetrain</artifactId>
+				<version>Gosling-RELEASE</version>
+				<scope>import</scope>
+				<type>pom</type>
+			</dependency>
+
+        <!-- Spring Data REST -->
+
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-context</artifactId>
-            <version>${org.springframework-version}</version>
-            <exclusions>
-                <exclusion>
-                    <!-- use slf4j -->
-                    <groupId>commons-logging</groupId>
-                    <artifactId>commons-logging</artifactId>
-                </exclusion>
-            </exclusions>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-rest-webmvc</artifactId>
+        </dependency>
+
+        <!-- Spring Data JPA -->
+
+        <dependency>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-jpa</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${org.springframework-version}</version>
+            <groupId>org.springframework.data</groupId>
+            <artifactId>spring-data-commons</artifactId>
         </dependency>
+
         <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-web</artifactId>
-            <version>${org.springframework-version}</version>
+            <groupId>org.springframework.hateoas</groupId>
+            <artifactId>spring-hateoas</artifactId>
         </dependency>
+
+
+        <!-- Spring Cloud -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-aws</artifactId>
+            <version>${spring-cloud.version}</version>
+        </dependency>
+
         <!-- AspectJ -->
         <dependency>
             <groupId>org.aspectj</groupId>
             <artifactId>aspectjrt</artifactId>
             <version>${org.aspectj-version}</version>
+        </dependency>
+
+        <!-- Hibernate / JPA -->
+        <dependency>
+            <groupId>org.hibernate.javax.persistence</groupId>
+            <artifactId>hibernate-jpa-2.0-api</artifactId>
+            <version>1.0.1.Final</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate</groupId>
+            <artifactId>hibernate-entitymanager</artifactId>
+            <version>4.1.12.Final</version>
         </dependency>
 
         <!-- Logging -->
@@ -152,12 +203,40 @@
             <artifactId>jstl-impl</artifactId>
             <version>1.2</version>
         </dependency>
-        <!-- amazon aws
+
+        <!-- amazon aws -->
         <dependency>
             <groupId>com.amazonaws</groupId>
             <artifactId>aws-java-sdk</artifactId>
-            <version>1.3.10</version>
-        </dependency> -->
+            <version>1.10.22</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.166</version>
+            <type>jar</type>
+            <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.mchange</groupId>
+            <artifactId>c3p0</artifactId>
+            <version>0.9.5.1</version>
+        </dependency>
+        <!-- MySql Database -->
+        <dependency>
+            <groupId>commons-dbcp</groupId>
+            <artifactId>commons-dbcp</artifactId>
+            <version>1.4</version>
+        </dependency>
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.33</version>
+        </dependency>
+
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
@@ -218,11 +297,11 @@
                     </execution>
                 </executions>
             </plugin>
-  <plugin>
-	<groupId>org.eclipse.jetty</groupId>
-	<artifactId>jetty-maven-plugin</artifactId>
-	<version>9.2.11.v20150529</version>
-  </plugin>
+            <plugin>
+                <groupId>org.eclipse.jetty</groupId>
+                <artifactId>jetty-maven-plugin</artifactId>
+                <version>9.2.11.v20150529</version>
+            </plugin>
         </plugins>
     </build>
     <pluginRepositories>

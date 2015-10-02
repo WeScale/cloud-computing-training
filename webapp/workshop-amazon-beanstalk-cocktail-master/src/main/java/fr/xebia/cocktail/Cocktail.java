@@ -15,34 +15,43 @@
  */
 package fr.xebia.cocktail;
 
-import java.util.Collection;
-import java.util.Deque;
-import java.util.List;
-
-import javax.annotation.Nonnull;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
+import org.springframework.data.annotation.Version;
+
+import javax.annotation.Nonnull;
+import javax.persistence.*;
+import java.util.Collection;
+import java.util.Deque;
+import java.util.List;
 
 /**
  * The recipe of a cocktail. Root model object.
- * 
+ *
  * @author <a href="mailto:cleclerc@xebia.fr">Cyrille Le Clerc</a>
  */
+@Entity
+@Table(name = "cocktail")
 public class Cocktail implements Comparable<Cocktail> {
 
+
+    private final @Id @GeneratedValue(strategy = GenerationType.AUTO) @JsonIgnore String id;
+    private @Version Long version;
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ingredient> ingredients = Lists.newArrayList();
 
+    @Lob
     private String instructions;
 
     @Nonnull
     private String name;
 
-    private String id;
 
     private String photoUrl;
 
@@ -51,7 +60,13 @@ public class Cocktail implements Comparable<Cocktail> {
      */
     private String sourceUrl;
 
-    private Deque<String> comments = Lists.newLinkedList();
+    @ElementCollection
+    private List<String> comments = Lists.newLinkedList();
+
+
+    public Cocktail() {
+        this.id = null;
+    }
 
     @Override
     public int compareTo(Cocktail other) {
@@ -73,7 +88,7 @@ public class Cocktail implements Comparable<Cocktail> {
         return Objects.equal(this.id, other.id);
     }
 
-    public Deque<String> getComments() {
+    public List<String> getComments() {
         return comments;
     }
 
@@ -119,12 +134,12 @@ public class Cocktail implements Comparable<Cocktail> {
         return Objects.hashCode(this.id);
     }
 
-    public void setComments(Deque<String> comments) {
+    public void setComments(List<String> comments) {
         this.comments = comments;
     }
 
     public void setId(String id) {
-        this.id = id;
+        //   this.id = id;
     }
 
     public void setIngredients(List<Ingredient> ingredients) {
@@ -156,7 +171,7 @@ public class Cocktail implements Comparable<Cocktail> {
     }
 
     public Cocktail addComment(String comment) {
-        getComments().addFirst(comment);
+        getComments().add(comment);
         return this;
     }
 

@@ -16,6 +16,11 @@
 package fr.xebia.cocktail;
 
 import com.google.common.base.Objects;
+import org.hibernate.annotations.GenericGenerator;
+
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
 
 /**
  * Ingredients of the cocktails.
@@ -23,13 +28,18 @@ import com.google.common.base.Objects;
  * @see Cocktail#getIngredients()
  * @author <a href="mailto:cleclerc@xebia.fr">Cyrille Le Clerc</a>
  */
+@Entity
 public class Ingredient {
 
-    public Ingredient() {
+private final @Id @GeneratedValue(generator = "uuid")
+@GenericGenerator(name = "uuid", strategy = "uuid2") String id;
 
+    public Ingredient() {
+            this.id = null;
     }
 
     public Ingredient(String quantity, String name) {
+this.id = null;
         this.quantity = quantity;
         this.name = name;
     }
