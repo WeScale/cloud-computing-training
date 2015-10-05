@@ -22,9 +22,7 @@
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd">
 
-    <context:component-scan base-package="fr.xebia.cocktail"/>
-    <!-- Load Hibernate related configuration -->
-	<import resource="hibernate-context.xml" />
+<context:component-scan base-package="fr.xebia.cocktail"/>
 
 
     <context:mbean-export/>

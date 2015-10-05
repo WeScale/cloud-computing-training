@@ -98,6 +98,13 @@
             <version>${spring-cloud.version}</version>
         </dependency>
 
+                <!-- Spring Cloud -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-aws-jdbc</artifactId>
+            <version>${spring-cloud.version}</version>
+        </dependency>
+
         <!-- AspectJ -->
         <dependency>
             <groupId>org.aspectj</groupId>
@@ -266,15 +273,25 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.8.1</version>
             </plugin>
-            <plugin>
-                <groupId>com.cloudbees</groupId>
-                <artifactId>bees-maven-plugin</artifactId>
-                <version>1.0-SNAPSHOT</version>
-                <configuration>
-                    <appid>atelier-xebia/cocktail-web-caching</appid>
-                </configuration>
-            </plugin>
-            <plugin>
+<plugin>
+    <groupId>de.juplo</groupId>
+    <artifactId>hibernate4-maven-plugin</artifactId>
+    <version>1.1.0</version>
+    <executions>
+        <execution>
+            <goals>
+                <goal>export</goal>
+            </goals>
+        </execution>
+    </executions>
+    <configuration>
+
+        <hibernateDialect>org.hibernate.dialect.MySQL5InnoDBDialect</hibernateDialect>
+                <outputFile>${project.build.directory}/mysql-schema.sql</outputFile>
+
+        <target>SCRIPT</target>
+    </configuration>
+</plugin>            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
                 <version>2.3</version>

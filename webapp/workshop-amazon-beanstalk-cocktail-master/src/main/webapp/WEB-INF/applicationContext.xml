@@ -21,8 +21,7 @@
         http://www.springframework.org/schema/cloud/aws/context
         http://www.springframework.org/schema/cloud/aws/context/spring-cloud-aws-context-1.0.xsd">
 
-    <aws-context:context-region region="eu-west-1"/>
-    <aws-context:context-credentials>
-        <aws-context:instance-profile-credentials/>
-    </aws-context:context-credentials>
+    <!-- Load Hibernate related configuration -->
+	<import resource="hibernate-context.xml" />
+
 </beans>

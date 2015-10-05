@@ -22,12 +22,12 @@ import com.google.common.base.Strings;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Lists;
+import org.hibernate.annotations.GenericGenerator;
 import org.springframework.data.annotation.Version;
 
 import javax.annotation.Nonnull;
 import javax.persistence.*;
 import java.util.Collection;
-import java.util.Deque;
 import java.util.List;
 
 /**
@@ -40,10 +40,11 @@ import java.util.List;
 public class Cocktail implements Comparable<Cocktail> {
 
 
-    private final @Id @GeneratedValue(strategy = GenerationType.AUTO) @JsonIgnore String id;
+    private final @Id @GeneratedValue(generator = "uuid")
+@GenericGenerator(name = "uuid", strategy = "uuid2")  String id;
     private @Version Long version;
 
-    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.EAGER)
     private List<Ingredient> ingredients = Lists.newArrayList();
 
     @Lob
@@ -60,7 +61,7 @@ public class Cocktail implements Comparable<Cocktail> {
      */
     private String sourceUrl;
 
-    @ElementCollection
+    @ElementCollection()
     private List<String> comments = Lists.newLinkedList();
 
 
